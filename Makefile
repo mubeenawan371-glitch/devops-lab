@@ -1,4 +1,4 @@
-# Makefile — fallback copy of the Lab 02 model answer.
+	# Makefile — fallback copy of the Lab 02 model answer.
 # Use ONLY if you no longer have your own Lab 02 work, and say so in your report.
 # Verified against GNU Make 3.81 and 4.3.
 
@@ -40,3 +40,6 @@ ci: clean check test  ## the build server entry point
 help:  ## show this help
 	@grep -E '^[a-z][a-zA-Z_-]*:.*?## ' $(MAKEFILE_LIST) \
 	 | sed 's/:.*## /\t/' | column -t -s "$$(printf '\t')"
+
+count: build ## count the source files
+	@ls -1 $(SRC_DIR)/*.txt | wc -l
