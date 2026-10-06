@@ -1,41 +1,56 @@
+<<<<<<< HEAD
 	# Makefile — fallback copy of the Lab 02 model answer.
 # Use ONLY if you no longer have your own Lab 02 work, and say so in your report.
 # Verified against GNU Make 3.81 and 4.3.
 
+=======
+>>>>>>> feature/word-count
 SRC_DIR := src
 OUT_DIR := out
 SOURCES := $(wildcard $(SRC_DIR)/*.txt)
-OUTPUTS := $(patsubst $(SRC_DIR)/%.txt,$(OUT_DIR)/%.txt,$(SOURCES))
+OUTPUTS := $(patsubst $(SRC_DIR)/%.txt, $(OUT_DIR)/%.txt, $(SOURCES))
 
-.PHONY: all check build test clean ci help
+.PHONY: all check build test clean ci
+	
+# First target builds and tests everything via dependency chaining
+all: test
 
-all: test  ## build and test everything (default)
-
+# Order-only prerequisite for output directory creation
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
 
+# Pattern rule for uppercase conversion using automatic variables
 $(OUT_DIR)/%.txt: $(SRC_DIR)/%.txt | $(OUT_DIR)
-	@echo "  BUILD $< -> $@"
+	@echo "BUILD $< -> $@"
 	@tr '[:lower:]' '[:upper:]' < $< > $@
 
-check:  ## fail early if there is nothing to build
-	@test -d $(SRC_DIR) || { echo "ERROR: source directory $(SRC_DIR) not found"; exit 1; }
-	@test -n "$(SOURCES)" || { echo "ERROR: no .txt files found in $(SRC_DIR)"; exit 1; }
-	@echo "check: $(words $(SOURCES)) source file(s) in $(SRC_DIR)"
+# Validates source directory and file presence
+check:
+	@if [ ! -d "$(SRC_DIR)" ] || [ -z "$(wildcard $(SRC_DIR)/*.txt)" ]; then \
+		echo "ERROR: no .txt files found in $(SRC_DIR)"; \
+		exit 1; \
+	fi
+	@echo "CHECK: Found $(words $(wildcard $(SRC_DIR)/*.txt)) source file(s) in $(SRC_DIR)"
 
-build: $(OUTPUTS)  ## build every out-of-date output
+# Build stage depends on all mapped output files
+build: $(OUTPUTS)
 
-test: build  ## verify every output
+# Test stage asserts that no lowercase letters remain in any output
+test: build
 	@if grep -l '[a-z]' $(OUTPUTS) >/dev/null 2>&1; then \
-	   echo "TEST FAILED: lowercase characters remain"; exit 1; \
-	 fi
+		echo "TEST FAILED: lowercase characters remain"; \
+		exit 1; \
+	fi
 	@echo "TEST PASSED"
 
-clean:  ## remove all generated files
+# Cleans up generated artifacts completely
+clean:
 	rm -rf $(OUT_DIR)
 
-ci: clean check test  ## the build server entry point
+# CI pipeline runner sequence: clean -> check -> test
+ci: clean check test
 
+<<<<<<< HEAD
 # Extension answer: self-documenting targets.
 help:  ## show this help
 	@grep -E '^[a-z][a-zA-Z_-]*:.*?## ' $(MAKEFILE_LIST) \
@@ -43,3 +58,14 @@ help:  ## show this help
 
 count: build ## count the source files
 	@ls -1 $(SRC_DIR)/*.txt | wc -l
+=======
+
+
+count: build ## report how many words were built
+	@wc -w $(OUTPUTS) | tail -1
+>>>>>>> feature/word-count
+
+
+count: build ## report source files and built words
+	@ls -1 $(SRC_DIR)/*.txt | wc -l
+	@wc -w $(OUTPUTS) | tail -1
