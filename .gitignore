@@ -1,2 +1,4 @@
+# Build output and logs
 out/
 *.log
+*.tmp
